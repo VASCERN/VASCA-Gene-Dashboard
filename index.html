@@ -6,85 +6,101 @@
 <title>VASCERN-VASCA Gene Curation Dashboard</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; color: #1a1a1a; background: #fff; line-height: 1.5; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 17px; color: #1a1a1a; background: #fff; line-height: 1.6; }
 
-  .vd-meta { font-size: 11px; color: #aaa; padding: 12px 0 4px; }
-  .vd-tabs { display: flex; border-bottom: 1px solid #e0e0e0; margin-bottom: 1.25rem; flex-wrap: wrap; }
-  .vd-tab { padding: 10px 20px; font-size: 13px; color: #666; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; border-top: none; border-left: none; border-right: none; }
-  .vd-tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 500; }
-  .vd-panel { display: none; }
-  .vd-panel.active { display: block; }
+  .vd-meta { font-size: 14px; color: #585858; padding: 14px 0 8px; border-bottom: 3px solid #034D90; margin-bottom: 0; }
+  .vd-meta strong { color: #034D90; }
+
+  .vd-tabs { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 1.25rem; flex-wrap: wrap; background: #f8f9fa; }
+  .vd-tab { padding: 13px 24px; font-size: 16px; color: #585858; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+  .vd-tab:hover { color: #034D90; }
+  .vd-tab.active { color: #034D90; border-bottom-color: #034D90; font-weight: 600; background: #fff; }
 
   .vd-stats { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
-  .vd-stat { background: #f5f5f5; border-radius: 8px; padding: 8px 12px; flex: 1; min-width: 65px; }
-  .vd-stat .num { font-size: 20px; font-weight: 600; }
-  .vd-stat .lbl { font-size: 10px; color: #888; margin-top: 1px; }
+  .vd-stat { background: #f0f4f8; border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 70px; border-top: 3px solid #ddd; }
+  .vd-stat.s-def { border-top-color: #22AD84; }
+  .vd-stat.s-str { border-top-color: #009ABF; }
+  .vd-stat.s-mod { border-top-color: #FBBA00; }
+  .vd-stat.s-lim { border-top-color: #F4890A; }
+  .vd-stat.s-non { border-top-color: #C51A1B; }
+  .vd-stat .num { font-size: 26px; font-weight: 700; color: #034D90; }
+  .vd-stat .lbl { font-size: 13px; color: #585858; margin-top: 2px; }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1rem; font-size: 14px; color: #585858; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 
   .vd-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
-  .vd-controls input, .vd-controls select { font-size: 13px; padding: 7px 10px; height: 34px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #1a1a1a; font-family: inherit; }
-  .vd-controls input { flex: 1; min-width: 160px; }
-  .vd-controls select { min-width: 150px; }
+  .vd-controls input, .vd-controls select { font-size: 16px; padding: 9px 12px; height: 44px; border: 1px solid #ccc; border-radius: 6px; background: #fff; color: #1a1a1a; font-family: inherit; }
+  .vd-controls input { flex: 1; min-width: 200px; }
+  .vd-controls input:focus, .vd-controls select:focus { outline: none; border-color: #034D90; box-shadow: 0 0 0 2px rgba(3,77,144,0.12); }
+  .vd-controls select { min-width: 180px; }
 
   .vd-overflow { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 600; color: #888; border-bottom: 1px solid #e0e0e0; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
-  td { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-  tr:hover td { background: #fafafa; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; padding: 11px 14px; font-size: 13px; font-weight: 700; color: #585858; border-bottom: 2px solid #034D90; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; background: #f8f9fa; }
+  td { padding: 13px 14px; border-bottom: 1px solid #eee; vertical-align: middle; font-size: 15px; }
+  tr:hover td { background: #f0f7ff; }
   tr:last-child td { border-bottom: none; }
   .clickable-row { cursor: pointer; }
+  .clickable-row:hover td { background: #e8f2fc; }
 
-  .gene { font-weight: 600; font-family: 'Courier New', monospace; font-size: 12px; color: #1a1a1a; }
-  .disease { color: #333; }
-  .mono { font-family: 'Courier New', monospace; font-size: 11px; color: #666; }
-  .date-col { font-size: 11px; color: #888; white-space: nowrap; }
+  .gene { font-weight: 700; font-family: 'Courier New', monospace; font-size: 15px; color: #034D90; white-space: nowrap; }
+  .disease { color: #1a1a1a; font-size: 15px; }
+  .mono { font-family: 'Courier New', monospace; font-size: 13px; color: #585858; }
+  .date-col { font-size: 14px; color: #585858; white-space: nowrap; }
 
-  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; cursor: pointer; position: relative; }
-  .b-def { background: #d4edda; color: #155724; }
-  .b-str { background: #c3e6cb; color: #1e5631; }
-  .b-mod { background: #fff3cd; color: #856404; }
-  .b-lim { background: #fde8c8; color: #7d4800; }
-  .b-non { background: #f8d7da; color: #721c24; }
-  .b-min { background: #d4edda; color: #155724; }
-  .b-opt { background: #cce5ff; color: #004085; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+  .b-def { background: #d4f0e7; color: #0e6647; border: 1px solid #22AD84; }
+  .b-str { background: #d0eef5; color: #005f75; border: 1px solid #009ABF; }
+  .b-mod { background: #fff4cc; color: #7a5900; border: 1px solid #FBBA00; }
+  .b-lim { background: #fde8cc; color: #7a3a00; border: 1px solid #F4890A; }
+  .b-non { background: #fcd9d9; color: #7a0e0e; border: 1px solid #C51A1B; }
+  .b-min { background: #d4f0e7; color: #0e6647; border: 1px solid #22AD84; }
+  .b-opt { background: #d0eef5; color: #005f75; border: 1px solid #009ABF; }
+  .ref-icon { font-size: 12px; opacity: 0.7; }
 
-  .ref-icon { font-size: 10px; opacity: 0.6; }
+  .no-res { text-align: center; padding: 3rem; color: #585858; font-size: 16px; }
+  .vd-note { font-size: 15px; color: #585858; margin-bottom: 1.25rem; line-height: 1.6; padding: 14px 18px; background: #f0f7ff; border-left: 4px solid #034D90; border-radius: 0 6px 6px 0; }
 
-  .no-res { text-align: center; padding: 2.5rem; color: #888; font-size: 13px; }
-  .vd-note { font-size: 12px; color: #666; margin-bottom: 1.25rem; line-height: 1.6; padding: 10px 14px; background: #f5f5f5; border-left: 3px solid #ccc; }
-
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,77,144,0.35); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.open { display: flex; }
-  .modal { background: #fff; border-radius: 12px; padding: 24px; max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; position: relative; }
-  .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: #666; line-height: 1; padding: 4px 8px; }
-  .modal-close:hover { color: #1a1a1a; }
-  .modal-gene { font-family: 'Courier New', monospace; font-weight: 700; font-size: 18px; margin-bottom: 4px; }
-  .modal-disease { color: #555; font-size: 14px; margin-bottom: 16px; }
-  .modal-section { margin-bottom: 16px; }
-  .modal-label { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
-  .modal-value { font-size: 13px; color: #1a1a1a; line-height: 1.6; }
-  .modal-divider { border: none; border-top: 1px solid #eee; margin: 16px 0; }
-  .modal-comment-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #1a1a1a; }
-  .modal textarea { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical; min-height: 80px; font-family: inherit; line-height: 1.5; margin-bottom: 8px; }
-  .modal input[type="text"], .modal input[type="email"] { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; margin-bottom: 8px; height: 36px; }
+  .modal { background: #fff; border-radius: 12px; padding: 28px; max-width: 560px; width: 100%; max-height: 88vh; overflow-y: auto; position: relative; border-top: 4px solid #034D90; }
+  .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #585858; line-height: 1; padding: 4px 8px; border-radius: 4px; }
+  .modal-close:hover { background: #f0f0f0; color: #1a1a1a; }
+  .modal-gene { font-family: 'Courier New', monospace; font-weight: 700; font-size: 22px; color: #034D90; margin-bottom: 4px; }
+  .modal-disease { color: #585858; font-size: 16px; margin-bottom: 18px; line-height: 1.4; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .modal-section { }
+  .modal-label { font-size: 12px; font-weight: 700; color: #009ABF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .modal-value { font-size: 15px; color: #1a1a1a; line-height: 1.5; }
+  .modal-ref { font-size: 14px; color: #585858; line-height: 1.5; grid-column: 1 / -1; }
+  .modal-divider { border: none; border-top: 1px solid #eee; margin: 18px 0; }
+  .modal-comment-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #034D90; }
+  .modal-comment-sub { font-size: 14px; color: #585858; margin-bottom: 14px; line-height: 1.5; }
+  .modal textarea { width: 100%; font-size: 15px; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; resize: vertical; min-height: 90px; font-family: inherit; line-height: 1.5; margin-bottom: 8px; }
+  .modal textarea:focus { outline: none; border-color: #034D90; box-shadow: 0 0 0 2px rgba(3,77,144,0.12); }
+  .modal input[type="text"], .modal input[type="email"] { width: 100%; font-size: 15px; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; margin-bottom: 8px; height: 44px; }
+  .modal input:focus { outline: none; border-color: #034D90; box-shadow: 0 0 0 2px rgba(3,77,144,0.12); }
   .modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .modal-field label { font-size: 11px; font-weight: 600; color: #666; display: block; margin-bottom: 3px; }
-  .btn-primary { background: #1a1a1a; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
-  .btn-secondary { background: transparent; color: #1a1a1a; border: 1px solid #ddd; padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: inherit; }
-  .comment-success { display: none; background: #d4edda; color: #155724; border-radius: 6px; padding: 10px 14px; font-size: 13px; margin-top: 8px; }
-
-  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1rem; font-size: 11px; }
-  .legend-item { display: flex; align-items: center; gap: 5px; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .modal-field label { font-size: 13px; font-weight: 600; color: #585858; display: block; margin-bottom: 3px; }
+  .btn-primary { background: #034D90; color: #fff; border: none; padding: 11px 22px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .btn-primary:hover { background: #023a6e; }
+  .btn-secondary { background: transparent; color: #034D90; border: 1px solid #034D90; padding: 11px 18px; border-radius: 6px; font-size: 15px; cursor: pointer; font-family: inherit; }
+  .btn-secondary:hover { background: #f0f7ff; }
+  .comment-success { display: none; background: #d4f0e7; color: #0e6647; border-radius: 6px; padding: 12px 16px; font-size: 15px; margin-top: 10px; border: 1px solid #22AD84; }
 
   @media (max-width: 600px) {
     .modal-form-row { grid-template-columns: 1fr; }
-    .vd-stat .num { font-size: 16px; }
+    .modal-grid { grid-template-columns: 1fr; }
+    .vd-stat .num { font-size: 20px; }
+    th, td { padding: 10px 8px; }
   }
 </style>
 </head>
 <body>
 
-<p class="vd-meta">VASCERN-VASCA &middot; Gene curation dashboard &middot; Revencu et al., Orphanet J Rare Dis (2024) 19:213 &middot; Click any row to view references and submit a comment</p>
+<p class="vd-meta"><strong>VASCERN-VASCA</strong> &middot; Gene curation dashboard &middot; Revencu et al., Orphanet J Rare Dis (2024) 19:213 &middot; Click any row to view references and submit a comment</p>
 
 <div class="vd-tabs">
   <button class="vd-tab active" onclick="vdTab('assoc')">Gene&ndash;disease associations</button>
@@ -93,23 +109,23 @@
 
 <div id="vd-assoc" class="vd-panel active">
   <div class="vd-stats">
-    <div class="vd-stat"><div class="num" id="vd-s-tot">45</div><div class="lbl">total</div></div>
-    <div class="vd-stat"><div class="num" id="vd-s-def" style="color:#155724">16</div><div class="lbl">definitive</div></div>
-    <div class="vd-stat"><div class="num" id="vd-s-str" style="color:#1e5631">16</div><div class="lbl">strong</div></div>
-    <div class="vd-stat"><div class="num" id="vd-s-mod" style="color:#856404">3</div><div class="lbl">moderate</div></div>
-    <div class="vd-stat"><div class="num" id="vd-s-lim" style="color:#7d4800">7</div><div class="lbl">limited</div></div>
-    <div class="vd-stat"><div class="num" id="vd-s-non" style="color:#721c24">3</div><div class="lbl">no evidence</div></div>
+    <div class="vd-stat"><div class="num" id="vd-s-tot">45</div><div class="lbl">Total</div></div>
+    <div class="vd-stat s-def"><div class="num" id="vd-s-def">16</div><div class="lbl">Definitive</div></div>
+    <div class="vd-stat s-str"><div class="num" id="vd-s-str">16</div><div class="lbl">Strong</div></div>
+    <div class="vd-stat s-mod"><div class="num" id="vd-s-mod">3</div><div class="lbl">Moderate</div></div>
+    <div class="vd-stat s-lim"><div class="num" id="vd-s-lim">7</div><div class="lbl">Limited</div></div>
+    <div class="vd-stat s-non"><div class="num" id="vd-s-non">3</div><div class="lbl">No evidence</div></div>
   </div>
   <div class="legend">
-    <span class="legend-item"><span class="legend-dot" style="background:#155724"></span> Definitive</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#1e5631"></span> Strong</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#856404"></span> Moderate</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#7d4800"></span> Limited</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#721c24"></span> No evidence</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#22AD84"></span>Definitive</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#009ABF"></span>Strong</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#FBBA00"></span>Moderate</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#F4890A"></span>Limited</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#C51A1B"></span>No evidence</span>
   </div>
   <div class="vd-controls">
-    <input type="text" id="vd-q1" placeholder="Search gene or disease..." oninput="vdFilter1()">
-    <select id="vd-fs" onchange="vdFilter1()">
+    <input type="text" id="vd-q1" placeholder="Search gene or disease...">
+    <select id="vd-fs">
       <option value="">All strengths</option>
       <option value="DEFINITIVE">Definitive</option>
       <option value="STRONG">Strong</option>
@@ -121,10 +137,10 @@
   <div class="vd-overflow">
     <table>
       <thead><tr>
-        <th style="width:90px">Gene</th>
+        <th style="width:105px">Gene</th>
         <th>Disease / phenotype</th>
-        <th style="width:130px">Evidence strength</th>
-        <th style="width:100px">Last updated</th>
+        <th style="width:170px">Evidence strength</th>
+        <th style="width:120px">Last updated</th>
       </tr></thead>
       <tbody id="vd-tb1"></tbody>
     </table>
@@ -132,11 +148,11 @@
   <div class="no-res" id="vd-nr1" style="display:none">No associations match your filters.</div>
 </div>
 
-<div id="vd-regions" class="vd-panel">
-  <div class="vd-note">From Table 2, Revencu et al. (2024). <strong>Minimal required</strong> regions are well-established pathogenic sites. <strong>Optional</strong> regions include cancer hotspots or germline variants with emerging evidence in vascular anomalies. Transcript references from ensembl.org.</div>
+<div id="vd-regions" class="vd-panel" style="display:none">
+  <div class="vd-note">From Table 2, Revencu et al. (2024). <strong>Minimal required</strong> regions are well-established pathogenic sites. <strong>Optional</strong> regions include cancer hotspots or germline variants with emerging evidence. Transcript references from ensembl.org.</div>
   <div class="vd-controls">
-    <input type="text" id="vd-q2" placeholder="Search gene, exon, or amino acid..." oninput="vdFilter2()">
-    <select id="vd-ft" onchange="vdFilter2()">
+    <input type="text" id="vd-q2" placeholder="Search gene, exon, or amino acid...">
+    <select id="vd-ft">
       <option value="">Minimal + optional regions</option>
       <option value="minimal">Minimal required only</option>
       <option value="optional">Optional only</option>
@@ -145,10 +161,10 @@
   <div class="vd-overflow">
     <table>
       <thead><tr>
-        <th style="width:80px">Gene</th>
-        <th style="width:140px">Transcript</th>
-        <th style="width:90px">Type</th>
-        <th style="width:80px">Exon(s)</th>
+        <th style="width:95px">Gene</th>
+        <th style="width:160px">Transcript</th>
+        <th style="width:110px">Type</th>
+        <th style="width:95px">Exon(s)</th>
         <th>Amino acid residues</th>
       </tr></thead>
       <tbody id="vd-tb2"></tbody>
@@ -157,38 +173,39 @@
   <div class="no-res" id="vd-nr2" style="display:none">No regions match your filters.</div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="vd-modal" onclick="closeModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
+<div class="modal-overlay" id="vd-modal" onclick="closeModalBg(event)">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal()">&times;</button>
     <div class="modal-gene" id="m-gene"></div>
     <div class="modal-disease" id="m-disease"></div>
-    <div class="modal-section">
-      <div class="modal-label">Evidence strength</div>
-      <div id="m-strength"></div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-label">Pathway</div>
-      <div class="modal-value" id="m-pathway"></div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-label">Last updated</div>
-      <div class="modal-value" id="m-date"></div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-label">Reference</div>
-      <div class="modal-value" id="m-ref"></div>
+    <div class="modal-grid">
+      <div class="modal-section">
+        <div class="modal-label">Evidence strength</div>
+        <div id="m-strength"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-label">Pathway</div>
+        <div class="modal-value" id="m-pathway"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-label">Last updated</div>
+        <div class="modal-value" id="m-date"></div>
+      </div>
+      <div class="modal-section modal-ref">
+        <div class="modal-label">Reference</div>
+        <div class="modal-value" id="m-ref"></div>
+      </div>
     </div>
     <hr class="modal-divider">
     <div class="modal-comment-title">Submit a comment on this entry</div>
-    <p style="font-size:12px;color:#888;margin-bottom:12px">Comments are sent to the VASCA working group for review. They will not appear publicly.</p>
+    <p class="modal-comment-sub">Comments are sent to the VASCA working group for review. They will not appear publicly on this page.</p>
     <div class="modal-form-row">
       <div class="modal-field"><label>Your name *</label><input type="text" id="m-name" placeholder="J. Smith"></div>
       <div class="modal-field"><label>Institution</label><input type="text" id="m-inst" placeholder="Your centre"></div>
     </div>
     <div class="modal-field"><label>Email address *</label><input type="email" id="m-email" placeholder="your@email.com"></div>
     <div class="modal-field"><label>Comment *</label><textarea id="m-comment" placeholder="Describe your observation, new evidence, or suggested update..."></textarea></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
       <button class="btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn-primary" onclick="submitComment()">Send comment</button>
     </div>
@@ -289,19 +306,16 @@ var regions = [
 
 var currentRow = null;
 
-function bc(s) {
-  var m={DEFINITIVE:'b-def',STRONG:'b-str',MODERATE:'b-mod',LIMITED:'b-lim','NO EVIDENCE':'b-non'};
-  return 'badge '+(m[s]||'b-non');
-}
-function cap(s){ return s.charAt(0)+s.slice(1).toLowerCase(); }
+function bc(s){var m={DEFINITIVE:'b-def',STRONG:'b-str',MODERATE:'b-mod',LIMITED:'b-lim','NO EVIDENCE':'b-non'};return 'badge '+(m[s]||'b-non');}
+function cap(s){return s.charAt(0)+s.slice(1).toLowerCase();}
 
-function render1(data) {
-  var tb=document.getElementById('vd-tb1');
-  var nr=document.getElementById('vd-nr1');
+function render1(data){
+  var tb=document.getElementById('vd-tb1'),nr=document.getElementById('vd-nr1');
   if(!data.length){tb.innerHTML='';nr.style.display='block';return;}
   nr.style.display='none';
-  tb.innerHTML=data.map(function(r,i){
-    return '<tr class="clickable-row" onclick="openModal('+JSON.stringify(r).replace(/"/g,'&quot;')+')">'
+  tb.innerHTML=data.map(function(r){
+    var rd=JSON.stringify(r).replace(/"/g,'&quot;');
+    return '<tr class="clickable-row" onclick="openModal('+rd+')">'
       +'<td><span class="gene">'+r.g+'</span></td>'
       +'<td class="disease">'+r.d+'</td>'
       +'<td><span class="'+bc(r.s)+'">'+cap(r.s)+' <span class="ref-icon">&#9432;</span></span></td>'
@@ -317,82 +331,72 @@ function render1(data) {
   document.getElementById('vd-s-non').textContent=c('NO EVIDENCE');
 }
 
-function render2(data) {
-  var tb=document.getElementById('vd-tb2');
-  var nr=document.getElementById('vd-nr2');
+function render2(data){
+  var tb=document.getElementById('vd-tb2'),nr=document.getElementById('vd-nr2');
   if(!data.length){tb.innerHTML='';nr.style.display='block';return;}
   nr.style.display='none';
   tb.innerHTML=data.map(function(r){
     var b=r.type==='minimal'?'<span class="badge b-min">Minimal</span>':'<span class="badge b-opt">Optional</span>';
-    return '<tr><td><span class="gene">'+r.g+'</span></td><td class="mono">'+r.t+'</td><td>'+b+'</td><td style="font-size:12px">'+r.e+'</td><td style="font-size:12px">'+r.aa+'</td></tr>';
+    return '<tr><td><span class="gene">'+r.g+'</span></td><td class="mono">'+r.t+'</td><td>'+b+'</td><td style="font-size:15px">'+r.e+'</td><td style="font-size:15px">'+r.aa+'</td></tr>';
   }).join('');
 }
 
-function vdFilter1() {
+function vdFilter1(){
   var q=(document.getElementById('vd-q1').value||'').toLowerCase();
   var s=document.getElementById('vd-fs').value;
-  render1(assoc.filter(function(r){
-    return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.d.toLowerCase().indexOf(q)>-1))&&(!s||r.s===s);
-  }));
+  render1(assoc.filter(function(r){return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.d.toLowerCase().indexOf(q)>-1))&&(!s||r.s===s);}));
 }
 
-function vdFilter2() {
+function vdFilter2(){
   var q=(document.getElementById('vd-q2').value||'').toLowerCase();
   var t=document.getElementById('vd-ft').value;
-  render2(regions.filter(function(r){
-    return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.aa.toLowerCase().indexOf(q)>-1)||(r.e.toLowerCase().indexOf(q)>-1))&&(!t||r.type===t);
-  }));
+  render2(regions.filter(function(r){return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.aa.toLowerCase().indexOf(q)>-1)||(r.e.toLowerCase().indexOf(q)>-1))&&(!t||r.type===t);}));
 }
 
-function vdTab(id) {
-  document.querySelectorAll('.vd-panel').forEach(function(p){p.classList.remove('active');});
+function vdTab(id){
+  document.querySelectorAll('.vd-panel').forEach(function(p){p.style.display='none';});
   document.querySelectorAll('.vd-tab').forEach(function(t){t.classList.remove('active');});
-  document.getElementById('vd-'+id).classList.add('active');
-  var idx={assoc:0,regions:1}[id];
-  document.querySelectorAll('.vd-tab')[idx].classList.add('active');
+  document.getElementById('vd-'+id).style.display='block';
+  document.querySelectorAll('.vd-tab')[{assoc:0,regions:1}[id]].classList.add('active');
 }
 
-function openModal(r) {
-  currentRow = r;
-  document.getElementById('m-gene').textContent = r.g;
-  document.getElementById('m-disease').textContent = r.d;
-  document.getElementById('m-strength').innerHTML = '<span class="'+bc(r.s)+'" style="cursor:default">'+cap(r.s)+'</span>';
-  document.getElementById('m-pathway').textContent = r.p || 'Not specified';
-  document.getElementById('m-date').textContent = r.updated;
-  document.getElementById('m-ref').textContent = r.ref;
-  document.getElementById('m-name').value='';
-  document.getElementById('m-inst').value='';
-  document.getElementById('m-email').value='';
-  document.getElementById('m-comment').value='';
+function openModal(r){
+  currentRow=r;
+  document.getElementById('m-gene').textContent=r.g;
+  document.getElementById('m-disease').textContent=r.d;
+  document.getElementById('m-strength').innerHTML='<span class="'+bc(r.s)+'" style="cursor:default">'+cap(r.s)+'</span>';
+  document.getElementById('m-pathway').textContent=r.p||'Not specified';
+  document.getElementById('m-date').textContent=r.updated;
+  document.getElementById('m-ref').textContent=r.ref;
+  ['m-name','m-inst','m-email','m-comment'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('m-success').style.display='none';
   document.getElementById('vd-modal').classList.add('open');
   document.body.style.overflow='hidden';
 }
 
-function closeModal(e) {
-  if(e && e.target !== document.getElementById('vd-modal')) return;
+function closeModal(){
   document.getElementById('vd-modal').classList.remove('open');
   document.body.style.overflow='';
   currentRow=null;
 }
 
-function submitComment() {
+function closeModalBg(e){if(e.target===document.getElementById('vd-modal'))closeModal();}
+
+function submitComment(){
   var name=document.getElementById('m-name').value.trim();
   var email=document.getElementById('m-email').value.trim();
   var comment=document.getElementById('m-comment').value.trim();
-  if(!name||!email||!comment){alert('Please fill in your name, email, and comment.');return;}
+  if(!name||!email||!comment){alert('Please fill in your name, email address, and comment.');return;}
   var subject=encodeURIComponent('VASCA gene comment: '+currentRow.g+' / '+currentRow.d);
-  var body=encodeURIComponent(
-    'Gene: '+currentRow.g+'\n'+
-    'Disease / phenotype: '+currentRow.d+'\n'+
-    'Evidence strength: '+currentRow.s+'\n\n'+
-    'Comment:\n'+comment+'\n\n'+
-    'From: '+name+(document.getElementById('m-inst').value?' ('+document.getElementById('m-inst').value+')':'')+'\n'+
-    'Email: '+email
-  );
+  var body=encodeURIComponent('Gene: '+currentRow.g+'\nDisease / phenotype: '+currentRow.d+'\nEvidence strength: '+currentRow.s+'\n\nComment:\n'+comment+'\n\nFrom: '+name+(document.getElementById('m-inst').value?' ('+document.getElementById('m-inst').value+')':'')+'\nEmail: '+email);
   window.location.href='mailto:'+CONTACT_EMAIL+'?subject='+subject+'&body='+body;
   document.getElementById('m-success').style.display='block';
 }
+
+document.getElementById('vd-q1').addEventListener('input',vdFilter1);
+document.getElementById('vd-fs').addEventListener('change',vdFilter1);
+document.getElementById('vd-q2').addEventListener('input',vdFilter2);
+document.getElementById('vd-ft').addEventListener('change',vdFilter2);
 
 render1(assoc);
 render2(regions);
