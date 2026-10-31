@@ -3,18 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VASCERN-VASCA Gene Somatic Curation Dashboard</title>
+<title>VASCERN-VASCA Gene Curation Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 17px; color: #1a1a1a; background: #fff; line-height: 1.6; }
+  body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 17px; color: #1a1a1a; background: #fff; line-height: 1.6; }
 
-  .vd-meta { font-size: 14px; color: #585858; padding: 14px 0 8px; border-bottom: 3px solid #034D90; margin-bottom: 0; }
-  .vd-meta strong { color: #034D90; }
+  .vd-header { background: linear-gradient(135deg,#034D90 0%,#0a6bb8 100%); color: #fff; padding: 28px 32px 24px; border-radius: 8px 8px 0 0; }
+  .vd-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #b9d8f2; margin-bottom: 8px; }
+  .vd-title { font-size: 32px; font-weight: 700; line-height: 1.2; color: #fff; margin-bottom: 10px; }
+  .vd-sub { font-size: 17px; line-height: 1.55; color: #e6f1fa; max-width: 820px; margin-bottom: 20px; }
+  .vd-facts { display: flex; flex-wrap: wrap; gap: 12px 40px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.28); }
+  .vd-fact { font-size: 15px; line-height: 1.4; color: #fff; }
+  .vd-fact .k { display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #b9d8f2; margin-bottom: 3px; }
+  .vd-fact a { color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.55); }
+  .vd-fact a:hover { background: rgba(255,255,255,.15); }
+  @media (max-width: 600px) { .vd-header { padding: 20px 16px; } .vd-title { font-size: 24px; } .vd-sub { font-size: 15px; } }
 
-  .vd-tabs { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 1.25rem; flex-wrap: wrap; background: #f8f9fa; }
-  .vd-tab { padding: 13px 24px; font-size: 16px; color: #585858; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+  .vd-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: #f8f9fa; border-bottom: 1px solid #ddd; }
+  .vd-tabs { display: flex; flex-wrap: wrap; }
+  .vd-tab { padding: 13px 24px; font-size: 16px; color: #585858; cursor: pointer; border-bottom: 3px solid transparent; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
   .vd-tab:hover { color: #034D90; }
   .vd-tab.active { color: #034D90; border-bottom-color: #034D90; font-weight: 600; background: #fff; }
+  .btn-feedback { text-decoration: none; display: inline-block; margin: 8px 16px 8px 0; padding: 9px 18px; background: #034D90; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .btn-feedback:hover { background: #023a6e; }
 
   .vd-stats { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
   .vd-stat { background: #f0f4f8; border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 70px; border-top: 3px solid #ddd; }
@@ -45,12 +59,12 @@
   .clickable-row { cursor: pointer; }
   .clickable-row:hover td { background: #e8f2fc; }
 
-  .gene { font-weight: 700; font-family: 'Courier New', monospace; font-size: 15px; color: #034D90; white-space: nowrap; }
+  .gene { font-weight: 700; font-family: 'Montserrat', sans-serif; font-size: 15px; color: #034D90; white-space: nowrap; }
   .disease { color: #1a1a1a; font-size: 15px; }
-  .mono { font-family: 'Courier New', monospace; font-size: 13px; color: #585858; }
+  .mono { font-family: 'Montserrat', sans-serif; font-size: 13px; color: #585858; }
   .date-col { font-size: 14px; color: #585858; white-space: nowrap; }
 
-  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; }
   .b-def { background: #d4f0e7; color: #0e6647; border: 1px solid #22AD84; }
   .b-str { background: #d0eef5; color: #005f75; border: 1px solid #009ABF; }
   .b-mod { background: #fff4cc; color: #7a5900; border: 1px solid #FBBA00; }
@@ -58,40 +72,36 @@
   .b-non { background: #fcd9d9; color: #7a0e0e; border: 1px solid #C51A1B; }
   .b-min { background: #d4f0e7; color: #0e6647; border: 1px solid #22AD84; }
   .b-opt { background: #d0eef5; color: #005f75; border: 1px solid #009ABF; }
-  .ref-icon { font-size: 12px; opacity: 0.7; }
 
   .no-res { text-align: center; padding: 3rem; color: #585858; font-size: 16px; }
   .vd-note { font-size: 15px; color: #585858; margin-bottom: 1.25rem; line-height: 1.6; padding: 14px 18px; background: #f0f7ff; border-left: 4px solid #034D90; border-radius: 0 6px 6px 0; }
 
+  .pmid-col { font-size: 14px; line-height: 1.7; }
+  .pmid-col a, .modal-value a { color: #034D90; text-decoration: none; border-bottom: 1px dotted #034D90; white-space: nowrap; }
+  .dbname { white-space: nowrap; }
+  .pmid-col a:hover, .modal-value a:hover { background: #d0e4f7; }
+  .none { color: #888; }
+
+  /* REF MODAL */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,77,144,0.35); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.open { display: flex; }
-  .modal { background: #fff; border-radius: 12px; padding: 28px; max-width: 560px; width: 100%; max-height: 88vh; overflow-y: auto; position: relative; border-top: 4px solid #034D90; }
+  .modal { background: #fff; border-radius: 12px; padding: 28px; max-width: 520px; width: 100%; max-height: 88vh; overflow-y: auto; position: relative; border-top: 4px solid #034D90; }
   .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #585858; line-height: 1; padding: 4px 8px; border-radius: 4px; }
-  .modal-close:hover { background: #f0f0f0; color: #1a1a1a; }
-  .modal-gene { font-family: 'Courier New', monospace; font-weight: 700; font-size: 22px; color: #034D90; margin-bottom: 4px; }
+  .modal-close:hover { background: #f0f0f0; }
+  .modal-gene { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 22px; color: #034D90; margin-bottom: 4px; }
   .modal-disease { color: #585858; font-size: 16px; margin-bottom: 18px; line-height: 1.4; }
   .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .modal-section { }
   .modal-label { font-size: 12px; font-weight: 700; color: #009ABF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
   .modal-value { font-size: 15px; color: #1a1a1a; line-height: 1.5; }
   .modal-ref { font-size: 14px; color: #585858; line-height: 1.5; grid-column: 1 / -1; }
   .modal-divider { border: none; border-top: 1px solid #eee; margin: 18px 0; }
-  .modal-comment-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #034D90; }
-  .modal-comment-sub { font-size: 14px; color: #585858; margin-bottom: 14px; line-height: 1.5; }
-  .modal textarea { width: 100%; font-size: 15px; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; resize: vertical; min-height: 90px; font-family: inherit; line-height: 1.5; margin-bottom: 8px; }
-  .modal textarea:focus { outline: none; border-color: #034D90; box-shadow: 0 0 0 2px rgba(3,77,144,0.12); }
-  .modal input[type="text"], .modal input[type="email"] { width: 100%; font-size: 15px; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; margin-bottom: 8px; height: 44px; }
-  .modal input:focus { outline: none; border-color: #034D90; box-shadow: 0 0 0 2px rgba(3,77,144,0.12); }
-  .modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .modal-field label { font-size: 13px; font-weight: 600; color: #585858; display: block; margin-bottom: 3px; }
-  .btn-primary { background: #034D90; color: #fff; border: none; padding: 11px 22px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
-  .btn-primary:hover { background: #023a6e; }
-  .btn-secondary { background: transparent; color: #034D90; border: 1px solid #034D90; padding: 11px 18px; border-radius: 6px; font-size: 15px; cursor: pointer; font-family: inherit; }
-  .btn-secondary:hover { background: #f0f7ff; }
-  .comment-success { display: none; background: #d4f0e7; color: #0e6647; border-radius: 6px; padding: 12px 16px; font-size: 15px; margin-top: 10px; border: 1px solid #22AD84; }
+  .modal-hint { font-size: 14px; color: #585858; background: #f0f7ff; border-radius: 6px; padding: 12px 16px; line-height: 1.5; }
+  .modal-hint a { color: #034D90; font-weight: 600; cursor: pointer; text-decoration: underline; }
+  .btn-open-form { text-decoration: none; display: block; width: 100%; margin-top: 12px; padding: 12px; background: #034D90; color: #fff; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; text-align: center; }
+  .btn-open-form:hover { background: #023a6e; }
+
 
   @media (max-width: 600px) {
-    .modal-form-row { grid-template-columns: 1fr; }
     .modal-grid { grid-template-columns: 1fr; }
     .vd-stat .num { font-size: 20px; }
     th, td { padding: 10px 8px; }
@@ -100,14 +110,25 @@
 </head>
 <body>
 
-<p class="vd-meta"><strong>VASCERN-VASCA</strong> &middot; somatic gene curation dashboard &middot; Revencu et al., Orphanet J Rare Dis (2024) &middot; Click any row to view references and submit a comment</p>
+<header class="vd-header">
+  <div class="vd-eyebrow">VASCERN &middot; VASCA Genetics Sub-group</div>
+  <h1 class="vd-title">Gene curation dashboard</h1>
+  <p class="vd-sub">Curated gene&ndash;disease associations, variants and regions of interest for vascular anomalies. Click any row for details.</p>
+  <div class="vd-facts">
+    <div class="vd-fact"><span class="k">Based on</span><a href="https://doi.org/10.1186/s13023-024-03196-9" target="_blank" rel="noopener">Revencu et al., Orphanet J Rare Dis 2024; 19:213</a></div>
+    <div class="vd-fact"><span class="k">Dashboard last updated</span>31 October 2026</div>
+  </div>
+</header>
 
-<div class="vd-tabs">
-  <button class="vd-tab active" onclick="vdTab('assoc')">Gene&ndash;disease associations</button>
-  <button class="vd-tab" onclick="vdTab('regions')">Variants, exons and regions of interest</button>
+<div class="vd-topbar">
+  <div class="vd-tabs">
+    <button class="vd-tab active" onclick="vdTab('assoc')">Gene&ndash;disease associations</button>
+    <button class="vd-tab" onclick="vdTab('regions')">Variants, exons and regions of interest</button>
+  </div>
+  <a class="btn-feedback" href="https://vascern.eu/group/vascular-anomalies/clinical-decision-support-tool-vasca/gene-curation-dashboard/#submit-data" target="_top">+ Submit data / feedback</a>
 </div>
 
-<div id="vd-assoc" class="vd-panel active">
+<div id="vd-assoc" class="vd-panel" style="padding-top:1rem">
   <div class="vd-stats">
     <div class="vd-stat"><div class="num" id="vd-s-tot">45</div><div class="lbl">Total</div></div>
     <div class="vd-stat s-def"><div class="num" id="vd-s-def">16</div><div class="lbl">Definitive</div></div>
@@ -124,7 +145,7 @@
     <span class="legend-item"><span class="legend-dot" style="background:#C51A1B"></span>No evidence</span>
   </div>
   <div class="vd-controls">
-    <input type="text" id="vd-q1" placeholder="Search gene or disease...">
+    <input type="text" id="vd-q1" placeholder="Search gene, disease or PMID...">
     <select id="vd-fs">
       <option value="">All strengths</option>
       <option value="DEFINITIVE">Definitive</option>
@@ -140,7 +161,8 @@
         <th style="width:105px">Gene</th>
         <th>Disease / phenotype</th>
         <th style="width:170px">Evidence strength</th>
-        <th style="width:120px">Last updated</th>
+        <th style="width:200px">PMID references</th>
+        <th style="width:130px">Date of curation</th>
       </tr></thead>
       <tbody id="vd-tb1"></tbody>
     </table>
@@ -148,10 +170,10 @@
   <div class="no-res" id="vd-nr1" style="display:none">No associations match your filters.</div>
 </div>
 
-<div id="vd-regions" class="vd-panel" style="display:none">
-  <div class="vd-note">From Table 2, Revencu et al. (2024). <strong>Minimal required</strong> regions are well-established pathogenic sites. <strong>Optional</strong> regions include cancer hotspots or germline variants with emerging evidence. Transcript references from ensembl.org.</div>
+<div id="vd-regions" class="vd-panel" style="display:none;padding-top:1rem">
+  <div class="vd-note">From Table 2, Revencu et al. (2024). <strong>Minimal required</strong> regions are well-established pathogenic sites. <strong>Optional</strong> regions include cancer hotspots or germline variants with emerging evidence. Transcript references from ensembl.org. PMID references are given for minimal required regions only.</div>
   <div class="vd-controls">
-    <input type="text" id="vd-q2" placeholder="Search gene, exon, or amino acid...">
+    <input type="text" id="vd-q2" placeholder="Search gene, exon, amino acid or PMID...">
     <select id="vd-ft">
       <option value="">Minimal + optional regions</option>
       <option value="minimal">Minimal required only</option>
@@ -166,6 +188,7 @@
         <th style="width:110px">Type</th>
         <th style="width:95px">Exon(s)</th>
         <th>Amino acid residues</th>
+        <th style="width:200px">PMID references</th>
       </tr></thead>
       <tbody id="vd-tb2"></tbody>
     </table>
@@ -173,140 +196,136 @@
   <div class="no-res" id="vd-nr2" style="display:none">No regions match your filters.</div>
 </div>
 
+<!-- REFERENCE MODAL -->
 <div class="modal-overlay" id="vd-modal" onclick="closeModalBg(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">&times;</button>
     <div class="modal-gene" id="m-gene"></div>
     <div class="modal-disease" id="m-disease"></div>
     <div class="modal-grid">
-      <div class="modal-section">
+      <div>
         <div class="modal-label">Evidence strength</div>
         <div id="m-strength"></div>
       </div>
-      <div class="modal-section">
+      <div>
         <div class="modal-label">Pathway</div>
         <div class="modal-value" id="m-pathway"></div>
       </div>
-      <div class="modal-section">
-        <div class="modal-label">Last updated</div>
+      <div>
+        <div class="modal-label">Date of curation</div>
         <div class="modal-value" id="m-date"></div>
       </div>
-      <div class="modal-section modal-ref">
-        <div class="modal-label">Reference</div>
+      <div class="modal-ref">
+        <div class="modal-label">References</div>
         <div class="modal-value" id="m-ref"></div>
       </div>
     </div>
     <hr class="modal-divider">
-    <div class="modal-comment-title">Submit a comment on this entry</div>
-    <p class="modal-comment-sub">Comments are sent to the VASCA working group for review. They will not appear publicly on this page.</p>
-    <div class="modal-form-row">
-      <div class="modal-field"><label>Your name *</label><input type="text" id="m-name" placeholder="J. Smith"></div>
-      <div class="modal-field"><label>Institution</label><input type="text" id="m-inst" placeholder="Your centre"></div>
+    <div class="modal-hint">
+      Have new evidence or a comment on this gene? Use the submission form to share it with the VASCA working group.
     </div>
-    <div class="modal-field"><label>Email address *</label><input type="email" id="m-email" placeholder="your@email.com"></div>
-    <div class="modal-field"><label>Comment *</label><textarea id="m-comment" placeholder="Describe your observation, new evidence, or suggested update..."></textarea></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" onclick="submitComment()">Send comment</button>
-    </div>
-    <div class="comment-success" id="m-success">Thank you &mdash; your comment has been sent to the VASCA working group.</div>
+    <a class="btn-open-form" href="https://vascern.eu/group/vascular-anomalies/clinical-decision-support-tool-vasca/gene-curation-dashboard/#submit-data" target="_top">Open submission form</a>
   </div>
 </div>
 
 <script>
-var CONTACT_EMAIL = 'treasure.udechukwu@aphp.fr';
 
 var assoc = [
-  {g:"AGGF1",d:"Klippel-Trenaunay syndrome",s:"NO EVIDENCE",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"AKT1",d:"Proteus syndrome",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"AKT3",d:"CMTC variant (w/o hemi-megalencephaly) or CM (with LM?) with hypotrophy",s:"STRONG",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"ARAF",d:"CCLA",s:"LIMITED",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"BRAF",d:"Arteriovenous malformation",s:"STRONG",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"BRAF",d:"(Macrocystic) Lymphatic malformation",s:"MODERATE",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"BRAF",d:"Pyogenic granuloma",s:"STRONG",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"CBL",d:"Kaposiform lymphangiomatosis",s:"LIMITED",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GJA4",d:"Cutaneous venous malformation (cavernous histology)",s:"MODERATE",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GJA4",d:"Hepatic haemangioma",s:"STRONG",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNA11",d:"Capillary malformation w/o overgrowth",s:"DEFINITIVE",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNA11",d:"Sturge-Weber syndrome",s:"STRONG",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNA11",d:"Congenital haemangioma",s:"STRONG",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNAQ",d:"Capillary malformation w/o overgrowth",s:"DEFINITIVE",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNAQ",d:"Sturge-Weber syndrome",s:"DEFINITIVE",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNAQ",d:"Congenital haemangioma",s:"DEFINITIVE",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNAS",d:"Vascular malformation (any type)",s:"NO EVIDENCE",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"GNB2",d:"Sturge-Weber syndrome",s:"LIMITED",p:"G-protein",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"HRAS",d:"Vascular malformations (various types)",s:"STRONG",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"IDH1",d:"Maffucci syndrome",s:"DEFINITIVE",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"IDH1",d:"Spindle cell haemangioma",s:"DEFINITIVE",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"IDH2",d:"Maffucci syndrome",s:"STRONG",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"IDH2",d:"Spindle cell haemangioma",s:"STRONG",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"KRAS",d:"Sporadic arteriovenous malformation",s:"DEFINITIVE",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"KRAS",d:"Gorham-Stout disease",s:"MODERATE",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"KRAS",d:"Epithelioid haemangioma",s:"LIMITED",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"MAP2K1",d:"Arteriovenous malformation",s:"DEFINITIVE",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"MAP2K1",d:"Epithelioid haemangioma",s:"STRONG",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"MAP3K3",d:"Verrucous venous malformation",s:"STRONG",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"MAP3K3",d:"Cerebral cavernous malformation",s:"DEFINITIVE",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"NPM1",d:"Maffucci syndrome",s:"NO EVIDENCE",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"NRAS",d:"Vascular malformations (low-flow / various types)",s:"LIMITED",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"NRAS",d:"Kaposiform lymphangiomatosis",s:"DEFINITIVE",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"NRAS",d:"Pyogenic granuloma / tufted angioma",s:"LIMITED",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PIK3CA",d:"PIK3CA-related overgrowth spectrum (PROS)",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PIK3CA",d:"Lymphatic malformation",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PIK3CA",d:"Common venous malformation",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PIK3CA",d:"Megalencephaly-capillary malformation-polymicrogyria",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PIK3CA",d:"Generalised lymphatic anomaly",s:"STRONG",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PIK3CD",d:"Lymphatic malformation",s:"LIMITED",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PIK3R1",d:"Capillary malformation / dilated veins / overgrowth +/- lymphatic malformation",s:"STRONG",p:"PI3K/AKT/mTOR",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"PTPN11",d:"Capillary malformation w/o overgrowth",s:"STRONG",p:"RAS/MAPK",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"TEK",d:"Common venous malformation",s:"DEFINITIVE",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"TEK",d:"Blue Rubber Bleb Nevus syndrome",s:"STRONG",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
-  {g:"TEK",d:"Multifocal sporadic venous malformation",s:"STRONG",p:"",updated:"May 2024",ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"}
+  {g:"AGGF1",d:"Klippel-Trenaunay syndrome",s:"NO EVIDENCE",p:"",updated:"12 May 2022",pm:[],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"AKT1",d:"Proteus syndrome",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"29 Jun 2022",pm:["21793738", "23436452", "24387135", "24850616", "25782637", "26872686"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"AKT3",d:"CMTC variant (w/o hemi-megalencephaly) or CM (with LM?) with hypotrophy",s:"STRONG",p:"PI3K/AKT/mTOR",updated:"12 May 2022",pm:["34237354", "28969385", "25722288", "36695285"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"ARAF",d:"CCLA",s:"LIMITED",p:"RAS/MAPK",updated:"14 Apr 2022",pm:["31263281"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"BRAF",d:"Arteriovenous malformation",s:"STRONG",p:"RAS/MAPK",updated:"16 Nov 2022",pm:["29461977", "31891627", "30544177", "35238086"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"BRAF",d:"(Macrocystic) Lymphatic malformation",s:"MODERATE",p:"RAS/MAPK",updated:"12 May 2022",pm:["35373151"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"BRAF",d:"Pyogenic granuloma",s:"STRONG",p:"RAS/MAPK",updated:"16 Nov 2022",pm:["26802240", "29406329", "35393626"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"CBL",d:"Kaposiform lymphangiomatosis",s:"LIMITED",p:"RAS/MAPK",updated:"27 Apr 2023",pm:["32894644"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GJA4",d:"Cutaneous venous malformation (cavernous histology)",s:"MODERATE",p:"",updated:"27 Apr 2022",pm:["33912852"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GJA4",d:"Hepatic haemangioma",s:"STRONG",p:"",updated:"27 Apr 2022",pm:["33912852"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNA11",d:"Capillary malformation w/o overgrowth",s:"DEFINITIVE",p:"G-protein",updated:"27 Apr 2022",pm:["28120216", "29174369", "30677207", "31726051"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNA11",d:"Sturge-Weber syndrome",s:"STRONG",p:"G-protein",updated:"27 Apr 2022",pm:["35715928", "31838126", "26778290", "32771470", "35351629"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNA11",d:"Congenital haemangioma",s:"STRONG",p:"G-protein",updated:"27 Apr 2022",pm:["27058448", "27438697", "32255239", "34040639"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNAQ",d:"Capillary malformation w/o overgrowth",s:"DEFINITIVE",p:"G-protein",updated:"17 Nov 2022",pm:["23656586", "35635655", "29174369", "25188413", "31532024"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNAQ",d:"Sturge-Weber syndrome",s:"DEFINITIVE",p:"G-protein",updated:"16 Aug 2022",pm:["23656586", "25374402", "29725622", "26957145"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNAQ",d:"Congenital haemangioma",s:"DEFINITIVE",p:"G-protein",updated:"16 Aug 2022",pm:["27058448", "32115227", "29574926", "34040639"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNAS",d:"Vascular malformation (any type)",s:"NO EVIDENCE",p:"G-protein",updated:"6 Feb 2023",pm:[],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"GNB2",d:"Sturge-Weber syndrome",s:"LIMITED",p:"G-protein",updated:"12 May 2022",pm:["34124757"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"HRAS",d:"Vascular malformations (various types)",s:"STRONG",p:"RAS/MAPK",updated:"—",pm:["31637524", "31160609"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"IDH1",d:"Maffucci syndrome",s:"DEFINITIVE",p:"",updated:"15 Sep 2022",pm:["22057234", "21598255", "31240473", "22057236"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"IDH1",d:"Spindle cell haemangioma",s:"DEFINITIVE",p:"",updated:"15 Sep 2022",pm:["23485734", "28845532"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"IDH2",d:"Maffucci syndrome",s:"STRONG",p:"",updated:"15 Sep 2022",pm:["22057234", "21598255", "31240473", "24344754"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"IDH2",d:"Spindle cell haemangioma",s:"STRONG",p:"",updated:"15 Sep 2022",pm:["23485734", "28845532"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"KRAS",d:"Sporadic arteriovenous malformation",s:"DEFINITIVE",p:"RAS/MAPK",updated:"28 Apr 2023",pm:["29298116", "29461977", "31486960", "30677207", "34214981"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"KRAS",d:"Gorham-Stout disease",s:"MODERATE",p:"RAS/MAPK",updated:"28 Apr 2023",pm:["32591603", "34156985"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"KRAS",d:"Epithelioid haemangioma",s:"LIMITED",p:"RAS/MAPK",updated:"28 Apr 2023",pm:["34726260"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"MAP2K1",d:"Arteriovenous malformation",s:"DEFINITIVE",p:"RAS/MAPK",updated:"28 Apr 2023",pm:["28190454", "29461977", "31486960", "30566190", "33747785"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"MAP2K1",d:"Epithelioid haemangioma",s:"STRONG",p:"RAS/MAPK",updated:"28 Apr 2023",pm:["34726260"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"MAP3K3",d:"Verrucous venous malformation",s:"STRONG",p:"RAS/MAPK",updated:"16 Aug 2022",pm:["25728774", "33899768"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"MAP3K3",d:"Cerebral cavernous malformation",s:"DEFINITIVE",p:"RAS/MAPK",updated:"16 Aug 2022",pm:["33729480", "33891857", "35355835"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"NPM1",d:"Maffucci syndrome",s:"NO EVIDENCE",p:"",updated:"—",pm:[],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"NRAS",d:"Vascular malformations (low-flow / various types)",s:"LIMITED",p:"RAS/MAPK",updated:"16 Nov 2022",pm:["29461977", "29397482"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"NRAS",d:"Kaposiform lymphangiomatosis",s:"DEFINITIVE",p:"RAS/MAPK",updated:"16 Nov 2022",pm:["30542204", "31511039", "35246606", "35385405", "35787784"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"NRAS",d:"Pyogenic granuloma / tufted angioma",s:"LIMITED",p:"RAS/MAPK",updated:"16 Nov 2022",pm:["26802240", "30677207", "31887709"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PIK3CA",d:"PIK3CA-related overgrowth spectrum (PROS)",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"31 Mar 2022",pm:["34112235", "25681199", "35094709", "25915946", "22729222"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PIK3CA",d:"Lymphatic malformation",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"31 Mar 2022",pm:["25681199", "34112235", "25424831", "29985963"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PIK3CA",d:"Common venous malformation",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"31 Mar 2022",pm:["26637981", "27030594", "27030595", "29786783"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PIK3CA",d:"Megalencephaly-capillary malformation-polymicrogyria",s:"DEFINITIVE",p:"PI3K/AKT/mTOR",updated:"31 Mar 2022",pm:["22729224", "25915946", "34969807", "27631024"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PIK3CA",d:"Generalised lymphatic anomaly",s:"STRONG",p:"PI3K/AKT/mTOR",updated:"9 May 2023",pm:["30591517"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PIK3CD",d:"Lymphatic malformation",s:"LIMITED",p:"PI3K/AKT/mTOR",updated:"9 Jun 2022",pm:["33964933"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PIK3R1",d:"Capillary malformation / dilated veins / overgrowth +/- lymphatic malformation",s:"STRONG",p:"PI3K/AKT/mTOR",updated:"23 Mar 2023",pm:["34040190", "29174369"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"PTPN11",d:"Capillary malformation w/o overgrowth",s:"STRONG",p:"RAS/MAPK",updated:"3 Apr 2023",pm:["35778969", "36566878"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"TEK",d:"Common venous malformation",s:"DEFINITIVE",p:"",updated:"9 Jun 2022",pm:["19079259", "23801934", "32597867", "29786783", "35426265"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"TEK",d:"Blue Rubber Bleb Nevus syndrome",s:"STRONG",p:"",updated:"9 Jun 2022",pm:["27519652"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"},
+  {g:"TEK",d:"Multifocal sporadic venous malformation",s:"STRONG",p:"",updated:"9 Jun 2022",pm:["27519652"],ref:"Revencu et al., Orphanet J Rare Dis (2024) 19:213. https://doi.org/10.1186/s13023-024-03196-9"}
 ];
 
 var regions = [
-  {g:"AKT1",t:"NM_001382430.1",type:"minimal",e:"3",aa:"E17"},
-  {g:"AKT1",t:"NM_001382430.1",type:"optional",e:"3, 4",aa:"L52, Q79"},
-  {g:"AKT3",t:"NM_5465.7",type:"minimal",e:"3",aa:"E17"},
-  {g:"ARAF",t:"NM_001654.5",type:"minimal",e:"7",aa:"S214"},
-  {g:"ARAF",t:"NM_001654.5",type:"optional",e:"9",aa:"R255"},
-  {g:"BRAF",t:"NM_004333.4",type:"minimal",e:"15",aa:"V600"},
-  {g:"BRAF",t:"NM_004333.4",type:"optional",e:"6, 11, 14, 15, 16",aa:"T244-F247, Q257, G466, G469, N581-K601, Q636"},
-  {g:"CBL",t:"NM_005188.4",type:"minimal",e:"15",aa:"Y774"},
-  {g:"CBL",t:"NM_005188.4",type:"optional",e:"2, 7, 8, 9, 16",aa:"Y102, D359-K362, multiple hotspots/splice, C404-R420, A877"},
-  {g:"GJA4",t:"NM_002060.3",type:"minimal",e:"2",aa:"G41"},
-  {g:"GNA11",t:"NM_002067.5",type:"minimal",e:"4, 5",aa:"R183, Q209"},
-  {g:"GNA14",t:"NM_004297.4",type:"minimal",e:"4",aa:"Q205"},
-  {g:"GNAQ",t:"NM_002072.5",type:"minimal",e:"4, 5",aa:"R183, Q209"},
-  {g:"GNAQ",t:"NM_002072.5",type:"optional",e:"2",aa:"M59, T96"},
-  {g:"GNB2",t:"NM_005273.4",type:"minimal",e:"5",aa:"K78"},
-  {g:"HRAS",t:"NM_005343.4",type:"minimal",e:"2, 3",aa:"G12, G13, T58-M72"},
-  {g:"HRAS",t:"NM_005343.4",type:"optional",e:"3, 5",aa:"Q61, F156"},
-  {g:"IDH1",t:"NM_005896.4",type:"minimal",e:"4",aa:"R132"},
-  {g:"IDH2",t:"NM_002168.4",type:"minimal",e:"4",aa:"R172"},
-  {g:"IDH2",t:"NM_002168.4",type:"optional",e:"4",aa:"R140"},
-  {g:"KRAS",t:"NM_004985.5",type:"minimal",e:"2, 3, 4",aa:"K5, G12, G13, Q22, Q61, Y64, A146"},
-  {g:"KRAS",t:"NM_004985.5",type:"optional",e:"2, 3, 4, 5",aa:"V14, L19, T58-G60, K117, D153, F156"},
-  {g:"MAP2K1",t:"NM_002755.4",type:"minimal",e:"2, 3",aa:"F53-E62, P105-107, C121-G128"},
-  {g:"MAP2K1",t:"NM_002755.4",type:"optional",e:"2, 3, 5, 6, 7, 8",aa:"L42-D67, E102-M146, L177, E203, P264, P294, G301, S331"},
-  {g:"MAP3K3",t:"NM_002401.5",type:"minimal",e:"13",aa:"I441"},
-  {g:"MAP3K3",t:"NM_002401.5",type:"optional",e:"15",aa:"Y544"},
-  {g:"NRAS",t:"NM_002524.5",type:"minimal",e:"3, 4",aa:"Q61, A146"},
-  {g:"NRAS",t:"NM_002524.5",type:"optional",e:"2, 3",aa:"G12-P34, T50-G60"},
-  {g:"PIK3CA",t:"NM_006218.4",type:"minimal",e:"Full gene",aa:"Full gene"},
-  {g:"PIK3CD",t:"NM_005026.5",type:"minimal",e:"16",aa:"L666"},
-  {g:"PIK3CD",t:"NM_005026.5",type:"optional",e:"13, 24",aa:"S520, E1021"},
-  {g:"PIK3R1",t:"NM_181523.3",type:"minimal",e:"11, 13, 14",aa:"Y452-Y467, N564-Y580, W583/splice"},
-  {g:"PIK3R1",t:"NM_181523.3",type:"optional",e:"9, 10, 13",aa:"R348, G376, N564, K567/splice"},
-  {g:"PTPN11",t:"NM_002834.5",type:"minimal",e:"3, 12, 13",aa:"E76, V428, A461, T507"},
-  {g:"PTPN11",t:"NM_002834.5",type:"optional",e:"1-13",aa:"Multiple hotspots"},
-  {g:"TEK",t:"NM_00459.5",type:"minimal",e:"17, 22, 23",aa:"Y897-A925, R1099X, T1105-G1115"},
-  {g:"TEK",t:"NM_00459.5",type:"optional",e:"15, 17, 18, 23",aa:"R849, L920, F960, K1100-Y1113"}
+  {g:"AKT1",t:"NM_001382430.1",type:"minimal",e:"3",aa:"E17",pm:["21793738", "33030203", "30677207"]},
+  {g:"AKT1",t:"NM_001382430.1",type:"optional",e:"3, 4",aa:"L52, Q79",pm:[]},
+  {g:"AKT3",t:"NM_5465.7",type:"minimal",e:"3",aa:"E17",pm:["34237354", "28969385", "33309330", "25722288"]},
+  {g:"ARAF",t:"NM_001654.5",type:"minimal",e:"7",aa:"S214",pm:["31263281"]},
+  {g:"ARAF",t:"NM_001654.5",type:"optional",e:"9",aa:"R255",pm:[]},
+  {g:"BRAF",t:"NM_004333.4",type:"minimal",e:"15",aa:"V600",pm:["29316280", "30544177", "29461977", "31891627", "35238086"]},
+  {g:"BRAF",t:"NM_004333.4",type:"optional",e:"6, 11, 14, 15, 16",aa:"T244-F247, Q257, G466, G469, N581-K601, Q636",pm:[]},
+  {g:"CBL",t:"NM_005188.4",type:"minimal",e:"15",aa:"Y774",pm:["32894644"]},
+  {g:"CBL",t:"NM_005188.4",type:"optional",e:"2, 7, 8, 9, 16",aa:"Y102, D359-K362, multiple hotspots/splice, C404-R420, A877",pm:[]},
+  {g:"GJA4",t:"NM_002060.3",type:"minimal",e:"2",aa:"G41",pm:["33912852", "35902510", "35642047"],db:["ClinVar Miner"]},
+  {g:"GNA11",t:"NM_002067.5",type:"minimal",e:"4, 5",aa:"R183, Q209",pm:["31726051", "28120216", "26778290", "34040639", "30677207", "31838126"]},
+  {g:"GNA14",t:"NM_004297.4",type:"minimal",e:"4",aa:"Q205",pm:["29574926", "27476652"]},
+  {g:"GNAQ",t:"NM_002072.5",type:"minimal",e:"4, 5",aa:"R183, Q209",pm:["23656586", "25188413", "25374402", "28084343", "29174369", "30677207", "30870248", "31336681", "31532024", "31726051", "31838126", "35635655"]},
+  {g:"GNAQ",t:"NM_002072.5",type:"optional",e:"2",aa:"M59, T96",pm:[]},
+  {g:"GNB2",t:"NM_005273.4",type:"minimal",e:"5",aa:"K78",pm:["34124757"]},
+  {g:"HRAS",t:"NM_005343.4",type:"minimal",e:"2, 3",aa:"G12, G13, T58-M72",pm:["32043616", "34109654", "31160609", "31637524"]},
+  {g:"HRAS",t:"NM_005343.4",type:"optional",e:"3, 5",aa:"Q61, F156",pm:[]},
+  {g:"IDH1",t:"NM_005896.4",type:"minimal",e:"4",aa:"R132",pm:["22057234", "23485734", "30677207"]},
+  {g:"IDH2",t:"NM_002168.4",type:"minimal",e:"4",aa:"R172",pm:["22057234", "23485734"]},
+  {g:"IDH2",t:"NM_002168.4",type:"optional",e:"4",aa:"R140",pm:[]},
+  {g:"KRAS",t:"NM_004985.5",type:"minimal",e:"2, 3, 4",aa:"K5, G12, G13, Q22, Q61, Y64, A146",pm:["29298116", "31486960", "34114335", "32799314", "34056834", "34190333", "32591603", "32043616", "31026472", "30677207", "34607843", "34703427", "30544177", "35238086", "29461977", "31160609", "32859736", "34214981"]},
+  {g:"KRAS",t:"NM_004985.5",type:"optional",e:"2, 3, 4, 5",aa:"V14, L19, T58-G60, K117, D153, F156",pm:[]},
+  {g:"MAP2K1",t:"NM_002755.4",type:"minimal",e:"2, 3",aa:"F53-E62, P105-107, C121-G128",pm:["28190454", "29461977", "35238086", "31486960", "30382944", "34726260", "30566190", "33747785"]},
+  {g:"MAP2K1",t:"NM_002755.4",type:"optional",e:"2, 3, 5, 6, 7, 8",aa:"L42-D67, E102-M146, L177, E203, P264, P294, G301, S331",pm:[]},
+  {g:"MAP3K3",t:"NM_002401.5",type:"minimal",e:"13",aa:"I441",pm:["25728774", "33899768", "33729480", "33891857"],db:["ClinVar","LOVD"]},
+  {g:"MAP3K3",t:"NM_002401.5",type:"optional",e:"15",aa:"Y544",pm:[]},
+  {g:"NRAS",t:"NM_002524.5",type:"minimal",e:"3, 4",aa:"Q61, A146",pm:["32043616", "30677207", "31887709", "30542204", "29397482", "25695684"]},
+  {g:"NRAS",t:"NM_002524.5",type:"optional",e:"2, 3",aa:"G12-P34, T50-G60",pm:[]},
+  {g:"PIK3CA",t:"NM_006218.4",type:"minimal",e:"Full gene",aa:"Full gene",pm:["34112235"]},
+  {g:"PIK3CA",t:"NM_006218.4",type:"optional",e:"Full gene",aa:"Full gene",pm:[]},
+  {g:"PIK3CD",t:"NM_005026.5",type:"minimal",e:"16",aa:"L666",pm:["33964933"]},
+  {g:"PIK3CD",t:"NM_005026.5",type:"optional",e:"13, 24",aa:"S520, E1021",pm:[]},
+  {g:"PIK3R1",t:"NM_181523.3",type:"minimal",e:"11, 13, 14",aa:"Y452-Y467, N564-Y580, W583/splice",pm:["34040190", "29174369", "35964931"],db:["ClinVar Miner"]},
+  {g:"PIK3R1",t:"NM_181523.3",type:"optional",e:"9, 10, 13",aa:"R348, G376, N564, K567/splice",pm:[]},
+  {g:"PTPN11",t:"NM_002834.5",type:"minimal",e:"3, 12, 13",aa:"E76, V428, A461, T507",pm:["36566878", "35778969"],doi:"10.1016/j.gimo.2023.100562"},
+  {g:"PTPN11",t:"NM_002834.5",type:"optional",e:"1-13",aa:"Multiple hotspots",pm:[]},
+  {g:"TEK",t:"NM_00459.5",type:"minimal",e:"17, 22, 23",aa:"Y897-A925, R1099X, T1105-G1115",pm:["27519652", "30677207", "19079259", "21962923", "23801934", "19888299", "26319232", "27030595", "34649969", "34850385"],db:["ClinVar Miner","LOVD"]},
+  {g:"TEK",t:"NM_00459.5",type:"optional",e:"15, 17, 18, 23",aa:"R849, L920, F960, K1100-Y1113",pm:[]}
 ];
 
-var currentRow = null;
-
 function bc(s){var m={DEFINITIVE:'b-def',STRONG:'b-str',MODERATE:'b-mod',LIMITED:'b-lim','NO EVIDENCE':'b-non'};return 'badge '+(m[s]||'b-non');}
+function pmLinks(a,doi,db){
+  var out=(a||[]).map(function(p){return '<a href="https://pubmed.ncbi.nlm.nih.gov/'+p+'/" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+p+'</a>';});
+  if(doi) out.push('<a href="https://doi.org/'+doi+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">DOI</a>');
+  (db||[]).forEach(function(n){out.push('<span class="dbname">'+n+'</span>');});
+  return out.length?out.join(', '):'<span class="none">&mdash;</span>';
+}
 function cap(s){return s.charAt(0)+s.slice(1).toLowerCase();}
 
 function render1(data){
@@ -318,7 +337,8 @@ function render1(data){
     return '<tr class="clickable-row" onclick="openModal('+rd+')">'
       +'<td><span class="gene">'+r.g+'</span></td>'
       +'<td class="disease">'+r.d+'</td>'
-      +'<td><span class="'+bc(r.s)+'">'+cap(r.s)+' <span class="ref-icon">&#9432;</span></span></td>'
+      +'<td><span class="'+bc(r.s)+'">'+cap(r.s)+'</span></td>'
+      +'<td class="pmid-col">'+pmLinks(r.pm)+'</td>'
       +'<td class="date-col">'+r.updated+'</td>'
       +'</tr>';
   }).join('');
@@ -337,20 +357,20 @@ function render2(data){
   nr.style.display='none';
   tb.innerHTML=data.map(function(r){
     var b=r.type==='minimal'?'<span class="badge b-min">Minimal</span>':'<span class="badge b-opt">Optional</span>';
-    return '<tr><td><span class="gene">'+r.g+'</span></td><td class="mono">'+r.t+'</td><td>'+b+'</td><td style="font-size:15px">'+r.e+'</td><td style="font-size:15px">'+r.aa+'</td></tr>';
+    return '<tr><td><span class="gene">'+r.g+'</span></td><td class="mono">'+r.t+'</td><td>'+b+'</td><td style="font-size:15px">'+r.e+'</td><td style="font-size:15px">'+r.aa+'</td><td class="pmid-col">'+(r.type==='minimal'?pmLinks(r.pm,r.doi,r.db):'')+'</td></tr>';
   }).join('');
 }
 
 function vdFilter1(){
   var q=(document.getElementById('vd-q1').value||'').toLowerCase();
   var s=document.getElementById('vd-fs').value;
-  render1(assoc.filter(function(r){return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.d.toLowerCase().indexOf(q)>-1))&&(!s||r.s===s);}));
+  render1(assoc.filter(function(r){return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.d.toLowerCase().indexOf(q)>-1)||(r.pm.join(' ').indexOf(q)>-1))&&(!s||r.s===s);}));
 }
 
 function vdFilter2(){
   var q=(document.getElementById('vd-q2').value||'').toLowerCase();
   var t=document.getElementById('vd-ft').value;
-  render2(regions.filter(function(r){return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.aa.toLowerCase().indexOf(q)>-1)||(r.e.toLowerCase().indexOf(q)>-1))&&(!t||r.type===t);}));
+  render2(regions.filter(function(r){return(!q||(r.g.toLowerCase().indexOf(q)>-1)||(r.aa.toLowerCase().indexOf(q)>-1)||(r.e.toLowerCase().indexOf(q)>-1)||((r.pm||[]).join(' ').indexOf(q)>-1)||((r.db||[]).join(' ').toLowerCase().indexOf(q)>-1))&&(!t||r.type===t);}));
 }
 
 function vdTab(id){
@@ -361,15 +381,12 @@ function vdTab(id){
 }
 
 function openModal(r){
-  currentRow=r;
   document.getElementById('m-gene').textContent=r.g;
   document.getElementById('m-disease').textContent=r.d;
   document.getElementById('m-strength').innerHTML='<span class="'+bc(r.s)+'" style="cursor:default">'+cap(r.s)+'</span>';
   document.getElementById('m-pathway').textContent=r.p||'Not specified';
   document.getElementById('m-date').textContent=r.updated;
-  document.getElementById('m-ref').textContent=r.ref;
-  ['m-name','m-inst','m-email','m-comment'].forEach(function(id){document.getElementById(id).value='';});
-  document.getElementById('m-success').style.display='none';
+  document.getElementById('m-ref').innerHTML=(r.pm.length?'<div style="margin-bottom:8px"><strong>PMID references (genetic evidence):</strong><br>'+pmLinks(r.pm)+'</div>':'')+'<div>'+r.ref.replace(/(https:\/\/\S+)/,'<a href="$1" target="_blank" rel="noopener">$1</a>')+'</div>';
   document.getElementById('vd-modal').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -377,21 +394,9 @@ function openModal(r){
 function closeModal(){
   document.getElementById('vd-modal').classList.remove('open');
   document.body.style.overflow='';
-  currentRow=null;
 }
 
 function closeModalBg(e){if(e.target===document.getElementById('vd-modal'))closeModal();}
-
-function submitComment(){
-  var name=document.getElementById('m-name').value.trim();
-  var email=document.getElementById('m-email').value.trim();
-  var comment=document.getElementById('m-comment').value.trim();
-  if(!name||!email||!comment){alert('Please fill in your name, email address, and comment.');return;}
-  var subject=encodeURIComponent('VASCA gene comment: '+currentRow.g+' / '+currentRow.d);
-  var body=encodeURIComponent('Gene: '+currentRow.g+'\nDisease / phenotype: '+currentRow.d+'\nEvidence strength: '+currentRow.s+'\n\nComment:\n'+comment+'\n\nFrom: '+name+(document.getElementById('m-inst').value?' ('+document.getElementById('m-inst').value+')':'')+'\nEmail: '+email);
-  window.location.href='mailto:'+CONTACT_EMAIL+'?subject='+subject+'&body='+body;
-  document.getElementById('m-success').style.display='block';
-}
 
 document.getElementById('vd-q1').addEventListener('input',vdFilter1);
 document.getElementById('vd-fs').addEventListener('change',vdFilter1);
