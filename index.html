@@ -136,6 +136,13 @@
   .vd-howto[open] summary::before { content: "\2212"; }
   .vd-howto ul { margin: 0; padding: 0 24px 14px 52px; font-size: 15px; line-height: 1.6; color: #1a1a1a; }
   .vd-howto li { margin-bottom: 4px; }
+  .vd-howto + .vd-howto { border-top: 1px solid #d6e4f2; }
+  .vd-class { padding: 0 24px 16px 52px; font-size: 15px; line-height: 1.6; color: #1a1a1a; }
+  .vd-class p { margin: 0 0 12px; }
+  .vd-class dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 10px 16px; align-items: center; }
+  .vd-class dt, .vd-class dd { margin: 0; }
+  .vd-class .badge { cursor: default; }
+  @media (max-width: 600px) { .vd-class { padding: 0 16px 16px 16px; } .vd-class dl { grid-template-columns: 1fr; gap: 4px; } .vd-class dd { margin-bottom: 10px; } }
 
 
   @media (max-width: 600px) {
@@ -182,10 +189,23 @@
     <ul>
       <li>Use the search box to find a gene (for example PIK3CA) or a disease (for example lymphatic malformation).</li>
       <li>Use the filter to show only one evidence strength, or only minimal or optional regions.</li>
-      <li>Click a row to see the full record and its references. Click a gene name to see its variants, exons and regions of interest.</li>
+      <li>Click a row to see the full record and its references. Click a gene name to see its variants, exons and regions of interest. In the second tab, click a gene to see its disease associations.</li>
       <li>Switch between the two tabs to move between the tables.</li>
       <li>Use Export CSV to download the rows currently shown.</li>
     </ul>
+  </details>
+  <details class="vd-howto">
+    <summary>How evidence is classified</summary>
+    <div class="vd-class">
+      <p>Each gene&ndash;phenotype association has been evaluated using a modified version of the ClinGen Gene Clinical Validity Curation framework, adapted for somatic variant evidence. Associations are classified into five categories:</p>
+      <dl>
+        <dt><span class="badge b-def">Definitive</span></dt><dd>Strong and replicated evidence from multiple independent publications over more than 3 years.</dd>
+        <dt><span class="badge b-str">Strong</span></dt><dd>Substantial evidence supporting the association but replication criterion not yet met.</dd>
+        <dt><span class="badge b-mod">Moderate</span></dt><dd>Emerging evidence with some independent support.</dd>
+        <dt><span class="badge b-lim">Limited</span></dt><dd>Preliminary or case-level evidence only. Association is possible but not well established.</dd>
+        <dt><span class="badge b-non">No evidence</span></dt><dd>Insufficient published evidence to support the association.</dd>
+      </dl>
+    </div>
   </details>
 </div>
 
@@ -307,6 +327,17 @@
     <div class="gm-sub">Variants, exons and regions of interest</div>
     <div id="gm-body"></div>
     <button type="button" class="btn-gm" id="gm-goto">Show in the variants, exons and regions tab</button>
+  </div>
+</div>
+
+<!-- GENE ASSOCIATIONS MODAL -->
+<div class="modal-overlay" id="vd-amodal" onclick="closeAssocBg(event)">
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="am-gene">
+    <button class="modal-close" onclick="closeAssoc()" aria-label="Close">&times;</button>
+    <div class="modal-gene" id="am-gene"></div>
+    <div class="gm-sub">Gene&ndash;disease associations</div>
+    <div id="am-body"></div>
+    <button type="button" class="btn-gm" id="am-goto">Show in the gene&ndash;disease associations tab</button>
   </div>
 </div>
 
@@ -441,7 +472,7 @@ function render2(data){
   nr.style.display='none';
   tb.innerHTML=data.map(function(r){
     var b=r.type==='minimal'?'<span class="badge b-min">Minimal</span>':'<span class="badge b-opt">Optional</span>';
-    return '<tr><td><span class="gene">'+r.g+'</span></td><td class="mono">'+r.t+'</td><td>'+b+'</td><td style="font-size:15px">'+r.e+'</td><td style="font-size:15px">'+r.aa+'</td><td class="pmid-col">'+(r.type==='minimal'?pmLinks(r.pm,r.doi,r.db):'')+'</td></tr>';
+    return '<tr class="clickable-row" onclick="openAssoc(\''+r.g+'\')"><td><button type="button" class="gene gene-link" title="View gene&ndash;disease associations" onclick="event.stopPropagation();openAssoc(\''+r.g+'\')">'+r.g+'</button></td><td class="mono">'+r.t+'</td><td>'+b+'</td><td style="font-size:15px">'+r.e+'</td><td style="font-size:15px">'+r.aa+'</td><td class="pmid-col">'+(r.type==='minimal'?pmLinks(r.pm,r.doi,r.db):'')+'</td></tr>';
   }).join('');
 }
 
@@ -538,9 +569,39 @@ function closeGene(){
   document.getElementById('vd-gmodal').classList.remove('open');
   document.body.style.overflow='';
 }
+function openAssoc(g){
+  var rows=assoc.filter(function(r){return r.g===g;});
+  document.getElementById('am-gene').textContent=g;
+  var body=document.getElementById('am-body'),btn=document.getElementById('am-goto');
+  if(!rows.length){
+    body.innerHTML='<div class="gm-empty">No gene&ndash;disease associations are listed for this gene in the source publication.</div>';
+    btn.style.display='none';
+  } else {
+    body.innerHTML='<div class="gm-wrap"><table><thead><tr><th>Disease / phenotype</th><th>Evidence strength</th><th>PMID references</th><th>Date of curation</th></tr></thead><tbody>'+
+      rows.map(function(r){
+        return '<tr><td data-l="Disease / phenotype">'+r.d+'</td><td data-l="Evidence strength"><span class="'+bc(r.s)+'" style="cursor:default">'+cap(r.s)+'</span></td><td class="pmid-col" data-l="PMID references">'+pmLinks(r.pm)+'</td><td class="date-col" data-l="Date of curation">'+r.updated+'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+    btn.style.display='block';
+    btn.onclick=function(){
+      closeAssoc();
+      vdTab('assoc');
+      document.getElementById('vd-q1').value=g;
+      document.getElementById('vd-fs').value='';
+      vdFilter1();
+      window.scrollTo(0,0);
+    };
+  }
+  document.getElementById('vd-amodal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeAssoc(){
+  document.getElementById('vd-amodal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeAssocBg(e){if(e.target===document.getElementById('vd-amodal'))closeAssoc();}
 function closeGeneBg(e){if(e.target===document.getElementById('vd-gmodal'))closeGene();}
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeGene();closeModal();}
+  if(e.key==='Escape'){closeGene();closeAssoc();closeModal();}
 });
 
 document.getElementById('vd-q1').addEventListener('input',vdFilter1);
