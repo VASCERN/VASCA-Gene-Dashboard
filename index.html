@@ -116,8 +116,36 @@
   .btn-open-form { text-decoration: none; display: block; width: 100%; margin-top: 12px; padding: 12px; background: #034D90; color: #fff; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; text-align: center; }
   .btn-open-form:hover { background: #023a6e; }
 
+  /* GENE LINK + REGIONS POPUP */
+  button.gene-link { background: none; border: none; padding: 2px 0; cursor: pointer; text-decoration: underline; text-decoration-color: #9cc0e0; text-underline-offset: 3px; }
+  button.gene-link:hover, button.gene-link:focus-visible { text-decoration-color: #034D90; color: #023a6e; }
+  .modal.modal-wide { max-width: 760px; }
+  .gm-sub { color: #585858; font-size: 15px; margin-bottom: 16px; line-height: 1.4; }
+  .gm-wrap { overflow-x: auto; }
+  .gm-wrap table { width: 100%; min-width: 520px; }
+  .gm-empty { font-size: 15px; color: #585858; background: #f0f7ff; border-radius: 6px; padding: 14px 16px; line-height: 1.5; }
+  .btn-gm { display: block; width: 100%; margin-top: 16px; padding: 12px; background: #fff; color: #034D90; border: 2px solid #034D90; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; text-align: center; }
+  .btn-gm:hover { background: #f0f7ff; }
+
+  /* HOW TO USE */
+  .vd-howto-wrap { padding: 0; }
+  .vd-howto { background: #f0f7ff; border-bottom: 1px solid #d6e4f2; }
+  .vd-howto summary { cursor: pointer; padding: 12px 24px; font-weight: 700; font-size: 15px; color: #034D90; list-style: none; display: flex; align-items: center; gap: 8px; }
+  .vd-howto summary::-webkit-details-marker { display: none; }
+  .vd-howto summary::before { content: "+"; display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; border-radius: 50%; background: #034D90; color: #fff; font-size: 15px; line-height: 1; }
+  .vd-howto[open] summary::before { content: "\2212"; }
+  .vd-howto ul { margin: 0; padding: 0 24px 14px 52px; font-size: 15px; line-height: 1.6; color: #1a1a1a; }
+  .vd-howto li { margin-bottom: 4px; }
+
 
   @media (max-width: 600px) {
+    .gm-wrap table, .gm-wrap thead, .gm-wrap tbody, .gm-wrap tr, .gm-wrap td { display: block; min-width: 0; width: 100%; }
+    .gm-wrap thead { display: none; }
+    .gm-wrap tr { border: 1px solid #e3e8ee; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+    .gm-wrap td { border: none; padding: 4px 0; }
+    .gm-wrap td[data-l]::before { content: attr(data-l); display: block; font-size: 11px; font-weight: 700; color: #009ABF; text-transform: uppercase; letter-spacing: 0.05em; }
+    .vd-howto summary { padding: 12px 16px; }
+    .vd-howto ul { padding: 0 16px 14px 36px; }
     .modal-grid { grid-template-columns: 1fr; }
     .vd-stat .num { font-size: 20px; }
     .vd-stats { display: grid; grid-template-columns: repeat(3, 1fr); }
@@ -135,7 +163,7 @@
   </div>
   <div class="vd-hrow"><div class="vd-htext"><div class="vd-eyebrow">VASCERN &middot; VASCA Genetics Sub-group</div>
   <h1 class="vd-title">Gene curation dashboard</h1>
-  <p class="vd-sub">Curated gene&ndash;disease associations, variants and regions of interest for vascular anomalies. Click any row for details.</p>
+  <p class="vd-sub">Curated gene&ndash;disease associations, variants and regions of interest for vascular anomalies. Click any row for details, or a gene name for its variants, exons and regions of interest.</p>
   </div>
   <a class="btn-submit" href="https://vascern.eu/group/vascular-anomalies/clinical-decision-support-tool-vasca/gene-curation-dashboard/#submit-data" target="_blank" rel="noopener">
     <span class="btn-submit-main">Submit data or feedback</span>
@@ -147,6 +175,19 @@
     <div class="vd-fact"><span class="k">Dashboard last updated</span>31 October 2026</div>
   </div>
 </header>
+
+<div class="vd-howto-wrap">
+  <details class="vd-howto">
+    <summary>How to use this dashboard</summary>
+    <ul>
+      <li>Use the search box to find a gene (for example PIK3CA) or a disease (for example lymphatic malformation).</li>
+      <li>Use the filter to show only one evidence strength, or only minimal or optional regions.</li>
+      <li>Click a row to see the full record and its references. Click a gene name to see its variants, exons and regions of interest.</li>
+      <li>Switch between the two tabs to move between the tables.</li>
+      <li>Use Export CSV to download the rows currently shown.</li>
+    </ul>
+  </details>
+</div>
 
 <div class="vd-topbar">
   <div class="vd-tabs">
@@ -258,6 +299,17 @@
   </div>
 </div>
 
+<!-- GENE REGIONS MODAL -->
+<div class="modal-overlay" id="vd-gmodal" onclick="closeGeneBg(event)">
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="gm-gene">
+    <button class="modal-close" onclick="closeGene()" aria-label="Close">&times;</button>
+    <div class="modal-gene" id="gm-gene"></div>
+    <div class="gm-sub">Variants, exons and regions of interest</div>
+    <div id="gm-body"></div>
+    <button type="button" class="btn-gm" id="gm-goto">Show in the variants, exons and regions tab</button>
+  </div>
+</div>
+
 <script>
 
 var assoc = [
@@ -366,7 +418,7 @@ function render1(data){
   tb.innerHTML=data.map(function(r){
     var rd=JSON.stringify(r).replace(/"/g,'&quot;');
     return '<tr class="clickable-row" onclick="openModal('+rd+')">'
-      +'<td><span class="gene">'+r.g+'</span></td>'
+      +'<td><button type="button" class="gene gene-link" title="View variants, exons and regions of interest" onclick="event.stopPropagation();openGene(\''+r.g+'\')">'+r.g+'</button></td>'
       +'<td class="disease">'+r.d+'</td>'
       +'<td><span class="'+bc(r.s)+'">'+cap(r.s)+'</span></td>'
       +'<td class="pmid-col">'+pmLinks(r.pm)+'</td>'
@@ -455,6 +507,41 @@ function closeModal(){
 }
 
 function closeModalBg(e){if(e.target===document.getElementById('vd-modal'))closeModal();}
+
+function openGene(g){
+  var rows=regions.filter(function(r){return r.g===g;});
+  document.getElementById('gm-gene').textContent=g;
+  var body=document.getElementById('gm-body'),btn=document.getElementById('gm-goto');
+  if(!rows.length){
+    body.innerHTML='<div class="gm-empty">No variants, exons or regions of interest are listed for this gene in the source publication.</div>';
+    btn.style.display='none';
+  } else {
+    body.innerHTML='<div class="gm-wrap"><table><thead><tr><th>Type</th><th>Transcript</th><th>Exon(s)</th><th>Amino acid residues</th><th>References</th></tr></thead><tbody>'+
+      rows.map(function(r){
+        var b=r.type==='minimal'?'<span class="badge b-min">Minimal</span>':'<span class="badge b-opt">Optional</span>';
+        return '<tr><td>'+b+'</td><td class="mono" data-l="Transcript">'+r.t+'</td><td style="font-size:15px" data-l="Exon(s)">'+r.e+'</td><td style="font-size:15px" data-l="Amino acid residues">'+r.aa+'</td>'+(r.type==='minimal'?'<td class="pmid-col" data-l="References">'+pmLinks(r.pm,r.doi,r.db)+'</td>':'<td class="pmid-col"></td>')+'</tr>';
+      }).join('')+'</tbody></table></div>';
+    btn.style.display='block';
+    btn.onclick=function(){
+      closeGene();
+      vdTab('regions');
+      document.getElementById('vd-q2').value=g;
+      document.getElementById('vd-ft').value='';
+      vdFilter2();
+      window.scrollTo(0,0);
+    };
+  }
+  document.getElementById('vd-gmodal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeGene(){
+  document.getElementById('vd-gmodal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeGeneBg(e){if(e.target===document.getElementById('vd-gmodal'))closeGene();}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){closeGene();closeModal();}
+});
 
 document.getElementById('vd-q1').addEventListener('input',vdFilter1);
 document.getElementById('vd-fs').addEventListener('change',vdFilter1);
